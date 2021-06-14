@@ -12,12 +12,7 @@
 #include <grid_map_ros/grid_map_ros.hpp>
 #include <grid_map_msgs/GridMap.h>
 #include <boost/circular_buffer.hpp>
-<<<<<<< HEAD
 #include <rviz/message_filter_display.h>
-=======
-// The following replaces <rviz/message_filter_display.h>
-#include "grid_map_rviz_plugin/modified/message_filter_display.h"
->>>>>>> 539f9db782e73cd48a112a6a72f3dbc11868d80f
 #endif
 
 namespace Ogre {
@@ -36,11 +31,7 @@ class EditableEnumProperty;
 namespace grid_map_rviz_plugin {
 
 class GridMapVisual;
-<<<<<<< HEAD
 class GridMapDisplay : public rviz::MessageFilterDisplay<grid_map_msgs::GridMap>
-=======
-class GridMapDisplay : public MessageFilterDisplay<grid_map_msgs::GridMap>
->>>>>>> 539f9db782e73cd48a112a6a72f3dbc11868d80f
 {
 Q_OBJECT
  public:
