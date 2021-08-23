@@ -31,6 +31,7 @@ set(dependencies
   nav_msgs
   rcutils
   rosbag2_cpp
+  rosbag2_storage
   sensor_msgs
   std_msgs
   tf2

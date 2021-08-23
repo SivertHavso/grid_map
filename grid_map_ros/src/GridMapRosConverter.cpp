@@ -14,6 +14,7 @@
 #include <rosbag2_cpp/writers/sequential_writer.hpp>
 #include <rosbag2_cpp/reader.hpp>
 #include <rosbag2_cpp/readers/sequential_reader.hpp>
+#include <rosbag2_storage/storage_options.hpp>
 #include <rclcpp/serialization.hpp>
 #include <rclcpp/serialized_message.hpp>
 #include <rcutils/time.h>
@@ -677,14 +678,16 @@ bool GridMapRosConverter::saveToBag(
   converter_options.input_serialization_format = "cdr";
   converter_options.output_serialization_format = "cdr";
 
-  rosbag2_cpp::Writer writer(std::make_unique<rosbag2_cpp::writers::SequentialWriter>());
-  writer.open(storage_options, converter_options);
+  std::unique_ptr<rosbag2_cpp::Writer> writer;
+  auto sequential_writer = std::make_unique<rosbag2_cpp::writers::SequentialWriter>();
+  writer = std::make_unique<rosbag2_cpp::Writer>(std::move(sequential_writer));
+  writer->open(storage_options, converter_options);
 
   rosbag2_storage::TopicMetadata tm;
   tm.name = topic;
   tm.type = "grid_map_msgs/msg/GridMap";
   tm.serialization_format = "cdr";
-  writer.create_topic(tm);
+  writer->create_topic(tm);
 
   auto bag_message = std::make_shared<rosbag2_storage::SerializedBagMessage>();
 
@@ -697,7 +700,7 @@ bool GridMapRosConverter::saveToBag(
   bag_message->serialized_data = std::shared_ptr<rcutils_uint8_array_t>(
     &serialized_msg.get_rcl_serialized_message(), [](rcutils_uint8_array_t * /* data */) {});
 
-  writer.write(bag_message);
+  writer->write(bag_message);
   return true;
 }
 
@@ -713,16 +716,18 @@ bool GridMapRosConverter::loadFromBag(
   converter_options.input_serialization_format = "cdr";
   converter_options.output_serialization_format = "cdr";
 
-  rosbag2_cpp::Reader reader(std::make_unique<rosbag2_cpp::readers::SequentialReader>());
-  reader.open(storage_options, converter_options);
+  std::unique_ptr<rosbag2_cpp::Reader> reader;
+  auto sequential_reader = std::make_unique<rosbag2_cpp::readers::SequentialReader>();
+  reader = std::make_unique<rosbag2_cpp::Reader>(std::move(sequential_reader));
+  reader->open(storage_options, converter_options);
 
   bool isDataFound = false;
 
   grid_map_msgs::msg::GridMap extracted_gridmap_msg;
   rclcpp::Serialization<grid_map_msgs::msg::GridMap> serialization;
 
-  while (reader.has_next()) {
-    auto bag_message = reader.read_next();
+  while (reader->has_next()) {
+    auto bag_message = reader->read_next();
 
     if (bag_message->serialized_data != NULL) {
       rclcpp::SerializedMessage extracted_serialized_msg(*bag_message->serialized_data);
